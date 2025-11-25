@@ -1,12 +1,13 @@
-function  [chan] = bz_GetBestRippleChan(lfp)
+function  [chan] = bz_GetBestRippleChan(lfp, n_channels, sampling_rate)
 %[chan] = bz_GetBestRippleChan(lfp)
 %eventually this will detect which lfp channel has the highest SNR for the
 % ripple componenent of SPWR events....
 
-[b a]=butter(4,[140/625 180/625],'bandpass');
+% filters 140-180hz - uses normalized frequencies, where 1.0 = Nyquist frequency = sampling_rate/2.
+[b a]=butter(4,[140/(sampling_rate/2) 180/(sampling_rate/2)],'bandpass');
 
-for i=1:length(lfp.channels)
-    filt = FiltFiltM(b,a,single(lfp.data(:,i)));
+for i=1:n_channels
+    filt = FiltFiltM(b,a,single(lfp(:,i)));
     pow = fastrms(filt,15);    
     mRipple(i) = mean(pow);
     meRipple(i) = median(pow);
