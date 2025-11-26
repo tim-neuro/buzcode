@@ -4,11 +4,24 @@ function  [chan] = bz_GetBestSharpWaveChan(lfp, n_channels, sampling_rate, best_
 % Sharp wave componenent of SPWR events. Also makes sure that the channel is in
 % Stratum Radiatum with respect to ripple channel (100-1000um below, on same shank)
 
-% filters 140-180hz - uses normalized frequencies, where 1.0 = Nyquist frequency = sampling_rate/2.
+% filters 2-50hz - uses normalized frequencies, where 1.0 = Nyquist frequency = sampling_rate/2.
 [b, a]=butter(4,[2/(sampling_rate/2) 50/(sampling_rate/2)],'bandpass');
 
+% check on a single channel that filtering worked - if not, use lower order
+% filter
+filt_test = FiltFiltM(b,a,single(lfp.data(:,1)));
+if sum(isnan(filt_test)) > 100
+    [b, a]=butter(3,[140/(sampling_rate/2) 180/(sampling_rate/2)],'bandpass');
+    disp('Lower filter order had to be used to find best ripple channel')
+end
+% check if it still failed
+filt_test = FiltFiltM(b,a,single(lfp.data(:,1)));
+if sum(isnan(filt_test)) >100 
+    error('Filter failed when searching for best ripple channel')
+end
+
 for i=1:n_channels
-    filt = FiltFiltM(b,a,single(lfp(:,i)));
+    filt = FiltFiltM(b,a,single(lfp.data(:,i)));
     pow = fastrms(filt,15);    
     mSW(i) = mean(pow);
     meSE(i) = median(pow);
