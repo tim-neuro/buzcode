@@ -75,7 +75,7 @@ addRequired(p,'channels',channelsValidation)
 addParameter(p,'basename','',@isstr)
 addParameter(p,'intervals',[],@isnumeric)
 addParameter(p,'restrict',[],@isnumeric)
-addParameter(p,'basepath',pwd,@isstr);
+addParameter(p,'basepath',pwd,@isstr);S
 addParameter(p,'downsample',1,@isnumeric);
 % addParameter(p,'saveMat',false,@islogical);
 % addParameter(p,'forceReload',false,@islogical);
